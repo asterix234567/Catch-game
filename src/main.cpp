@@ -1,45 +1,67 @@
 #include <raylib.h>
-
+#define GRAVITY 400
+#define NUM_OBSTACLES 3
 
 int main() 
-{
-    int ballx = 400;                // X-Coordinate of the Ball
-    int bally = 400;                // Y-Coordinate of the Ball
-    int item_place_timer = 0;       // Timer to place a new item
-    int item_placed = 0;            // How many items are currently placed
+{ 
 
+    const int windowLenght = 800;         // Lenght of the Mainwindow
+    const int windowWidht = 600;          // Widht of the Mainwindow
 
-    InitWindow(800, 800, "First raylib project");
+    int ballx = windowLenght / 2;                // X-Coordinate of the Ball
+    int bally = windowWidht / 2;                // Y-Coordinate of the Ball
+
+    int playerspeed = 3;    
+
+    InitWindow(windowLenght, windowWidht, "Catch_Game");
+
+    Rectangle player = { 100, 100, 50, 50 };        // Initialising the Player Rectangle   
+
+    // Initialising the Obstacles    
+
+    Rectangle obstacles[NUM_OBSTACLES] = {
+        { 0, windowWidht - 50, windowLenght, 50 },  // GROUND
+        { 150, 250, 150, 50 },   // Platform 1
+        { 500, 250, 150, 50 }    // Platform 2
+    };
+
     SetTargetFPS(60);
 
     while(!WindowShouldClose())
     {
         if(IsKeyDown(KEY_RIGHT))
         {
-            ballx += 3;
+            ballx += playerspeed;
         }
         else if(IsKeyDown(KEY_LEFT))
         {
-            ballx -= 3;
+            ballx -= playerspeed;
         }
         else if(IsKeyDown(KEY_UP))
         {
-            bally -= 3;
+            bally -= playerspeed;
         }
         else if(IsKeyDown(KEY_DOWN))
         {
-            bally += 3;
+            bally += playerspeed;
         }
-
+        
+        for (int i = 0; i < NUM_OBSTACLES; i++) {
+            if (CheckCollisionRecs(player, obstacles[i])) {
+                // Zurücksetzen der Bewegung, falls Kollision
+                player.x -= playerspeed * (IsKeyDown(KEY_RIGHT) - IsKeyDown(KEY_LEFT));
+                player.y -= playerspeed * (IsKeyDown(KEY_DOWN) - IsKeyDown(KEY_UP));
+            }
+        }
         BeginDrawing();
 
         ClearBackground(BLACK);
 
-        DrawCircle(ballx, bally, 50, BLUE );
+        DrawRectangleRec(player, RED);
 
-        DrawRectangle(0, 750, 800, 50, GREEN);
-        DrawRectangle(150, 450, 150, 50, GRAY);
-        DrawRectangle(500, 450, 150, 50, GRAY);
+        for (int i = 0; i < NUM_OBSTACLES; i++) {
+            DrawRectangleRec(obstacles[i], GRAY);
+        }
 
         EndDrawing();
     }
