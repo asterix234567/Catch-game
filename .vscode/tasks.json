@@ -70,12 +70,10 @@
                     "OBJS=src/*.cpp"
                 ]
             },
-            "problemMatcher": [
-                "$gcc"
-            ],
+            "problemMatcher": [],
             "group": {
                 "kind": "build",
-                "isDefault": false
+                "isDefault": true
             },
             "detail": "compiler: C:\\raylib\\w64devkit\\bin\\g++.exe"
         },

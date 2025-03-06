@@ -4,18 +4,14 @@
 
 int main() 
 { 
-
     const int windowLenght = 800;         // Lenght of the Mainwindow
     const int windowWidht = 600;          // Widht of the Mainwindow
-
-    int ballx = windowLenght / 2;                // X-Coordinate of the Ball
-    int bally = windowWidht / 2;                // Y-Coordinate of the Ball
 
     int playerspeed = 3;    
 
     InitWindow(windowLenght, windowWidht, "Catch_Game");
 
-    Rectangle player = { 100, 100, 50, 50 };        // Initialising the Player Rectangle   
+    Rectangle player = { 400, 300, 50, 50 };        // Initialising the Player Rectangle   
 
     // Initialising the Obstacles    
 
@@ -31,19 +27,19 @@ int main()
     {
         if(IsKeyDown(KEY_RIGHT))
         {
-            ballx += playerspeed;
+            player.x += playerspeed;
         }
         else if(IsKeyDown(KEY_LEFT))
         {
-            ballx -= playerspeed;
+            player.x -= playerspeed;
         }
         else if(IsKeyDown(KEY_UP))
         {
-            bally -= playerspeed;
+            player.y -= playerspeed;
         }
         else if(IsKeyDown(KEY_DOWN))
         {
-            bally += playerspeed;
+            player.y += playerspeed;
         }
         
         for (int i = 0; i < NUM_OBSTACLES; i++) {
@@ -57,7 +53,7 @@ int main()
 
         ClearBackground(BLACK);
 
-        DrawRectangleRec(player, RED);
+        DrawRectangleRec(player, PURPLE);
 
         for (int i = 0; i < NUM_OBSTACLES; i++) {
             DrawRectangleRec(obstacles[i], GRAY);
