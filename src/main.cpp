@@ -4,16 +4,19 @@
 
 int main() 
 { 
-    const int windowLenght = 800;         // Lenght of the Mainwindow
-    const int windowWidht = 600;          // Widht of the Mainwindow
+    const int windowWidht = 800;         // Lenght of the Mainwindow
+    const int windowHeight = 600;          // Widht of the Mainwindow
 
-    int playerspeed = 4;
+    InitWindow(windowWidht, windowHeight, "Catch_Game");
 
-    InitWindow(windowLenght, windowWidht, "Catch_Game");
+    Rectangle playerRec = { 150, 100, 50, 50 };        // Initialising the Player Rectangle   
 
-    Rectangle playerRec = { 400, 300, 50, 50 };        // Initialising the Player Rectangle   
+    float velocityY = 0;        // Vertical velocity (+ ... the player falls, - ... flies up )
+    float gravity = 800;        // Gravitation (Pixel per s^2)
+    float playerspeed = 400;    // Movementspeed (Pixel per s)
+    float jumpForce = -700;     // Jump force: is applied at the beginning of the jump to VerticalY and slowly 
+    bool onGround = false;      // Checks if the player is on Ground
 
-    
     /*Image playerimage = 
     LoadImage("C:\Users\helene\Documents\checkouts\Catch-game\\textures\\player_test.png"); // Loading the player image
     
@@ -28,50 +31,88 @@ int main()
     // Initialising the Obstacles    
 
     Rectangle obstacles[NUM_OBSTACLES] = {
-        { 0, windowWidht - 50, windowLenght, 50 },  // GROUND
-        { 150, 250, 150, 50 },   // Platform 1
-        { 500, 250, 150, 50 }    // Platform 2
+        { 0, windowHeight - 20, windowWidht, 20 },  // GROUND
+        { 150, 300, 150, 20 },   // Platform 1
+        { 500, 300, 150, 20 }    // Platform 2
     };
 
     SetTargetFPS(60);
 
     while(!WindowShouldClose())
     {
+    float dt = GetFrameTime(); // Time since the last frame (Multiply with every speed)
+
+        Rectangle oldPlayerRec = playerRec;     // saves the last postion of the player
+
+        // Horizontal Movement with Arrow-Keys
+
         if(IsKeyDown(KEY_RIGHT))
         {
-            playerRec.x += playerspeed;
+            playerRec.x += playerspeed * dt;
         }
         else if(IsKeyDown(KEY_LEFT))
         {
-            playerRec.x -= playerspeed;
+            playerRec.x -= playerspeed * dt;
         }
-        else if(IsKeyDown(KEY_UP))
-        {
-            playerRec.y -= playerspeed;
-        }
-        else if(IsKeyDown(KEY_DOWN))
-        {
-            playerRec.y += playerspeed;
-        }
-        
+
+        // Gravitational Pull
+        velocityY += gravity * dt;
+        playerRec.y += velocityY * dt;
+
+        // Kollisionscheck
+
         for (int i = 0; i < NUM_OBSTACLES; i++) {
             if (CheckCollisionRecs(playerRec, obstacles[i])) {
-                // Zurücksetzen der Bewegung, falls Kollision
-                playerRec.x -= playerspeed * (IsKeyDown(KEY_RIGHT) - IsKeyDown(KEY_LEFT));
-                playerRec.y -= playerspeed * (IsKeyDown(KEY_DOWN) - IsKeyDown(KEY_UP));
+                if(oldPlayerRec.y + oldPlayerRec.height <= obstacles[i].y) // Upside: checks if the player is falling 
+                {
+                    playerRec.y = obstacles[i].y - oldPlayerRec.height;     // sets the player on the obstacle
+                    onGround = true;        // Now the player can jump again
+                    velocityY = 0;          // That the player stops building vertical speed
+                }
+                else if (oldPlayerRec.y >= obstacles[i].y + obstacles[i].height) // Downside
+                {
+                    playerRec.y = obstacles[i].y + obstacles[i].height;     // sets the player on the downside of the obstacle
+                    onGround = false;       // The player shouldnt be able to jump if hes on the downside
+                    velocityY = 0;          // Reset vertical speed, so the player falls
+                }
+                else if (oldPlayerRec.x < playerRec.x)  // Left side: checks if the player moved right
+                {
+                    playerRec.x = obstacles[i].x - playerRec.width;     // sets the player on the Left side of the obstacle
+                }
+                else if (oldPlayerRec.x > playerRec.x)  // Right side: checks if the player moved left
+                {
+                    playerRec.x = obstacles[i].x + obstacles[i].width;   // sets the player on the Right side of the obstacle
+                }
+                break;      // Only one collision at a frame
+            }
+            else
+            {
+                onGround = false;   // if the player doesnt collide with or stand on an obstacle hes falling
             }
         }
-    
-        if(playerRec.x<0)
-            playerRec.x+=4;
 
-        if(playerRec.x + playerRec.width > windowLenght)
-        playerRec.x-=4;
+        // Jumping
 
-        if(playerRec.y<0)
-            playerRec.y+=4;
-                
-            
+        if (IsKeyPressed(KEY_UP) && onGround) {
+            velocityY = jumpForce;
+            onGround = false;
+        }
+       
+        // Side barriers
+
+        if(playerRec.x<0)       // Left side
+            playerRec.x = 0;
+
+        if(playerRec.x + playerRec.width > windowWidht)     // Right side
+            playerRec.x = windowWidht - playerRec.width;
+
+        if(playerRec.y < 0)       // Upside
+        {
+            playerRec.y = 0;
+            velocityY = 0;
+        }
+        // Drawing the Frame
+
         BeginDrawing();
         ClearBackground(BLUE);
 
@@ -83,8 +124,9 @@ int main()
             0.0f, // Keine Rotation
             WHITE); // Standardfarbe
         */
-        DrawRectangleRec(playerRec, PURPLE);
+        DrawRectangleRec(playerRec, PURPLE);        // Player
 
+        // Obstacles
         for (int i = 0; i < NUM_OBSTACLES; i++) {
             DrawRectangleRec(obstacles[i], PINK);
         }
