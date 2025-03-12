@@ -5,9 +5,11 @@
 int main() 
 { 
     const int windowWidht = 800;         // Lenght of the Mainwindow
-    const int windowHeight = 600;          // Widht of the Mainwindow
+    const int windowHeight = 500;          // Widht of the Mainwindow
 
-    InitWindow(windowWidht, windowHeight, "Catch_Game");
+    InitWindow(windowWidht, windowHeight, "Catch_Game");        // Initialaising the Game Window
+
+    Texture2D background = LoadTexture("..\\textures\\Background1.png");  // Loading Background Image
 
     Rectangle playerRec = { 150, 100, 50, 50 };        // Initialising the Player Rectangle   
 
@@ -114,7 +116,9 @@ int main()
         // Drawing the Frame
 
         BeginDrawing();
-        ClearBackground(BLUE);
+        
+        ClearBackground(BLACK);
+        DrawTexture(background, 0, 0, WHITE);
 
         /*// 5. Textur mit transparenter Darstellung anstatt des Rechtecks zeichnen
         DrawTexturePro(playertexture, 
