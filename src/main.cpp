@@ -9,7 +9,7 @@ int main()
 
     InitWindow(windowWidht, windowHeight, "Catch_Game");        // Initialaising the Game Window
 
-    Texture2D background = LoadTexture("..\\textures\\Background1.png");  // Loading Background Image
+    Texture2D background = LoadTexture("textures\\Background1.png");  // Loading Background Image
 
     Rectangle playerRec = { 150, 100, 50, 50 };        // Initialising the Player Rectangle   
 
