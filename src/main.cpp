@@ -4,7 +4,7 @@
 
 int main() 
 { 
-    const int windowWidht = 800;         // Lenght of the Mainwindow
+    const int windowWidht = 878;         // Lenght of the Mainwindow
     const int windowHeight = 500;          // Widht of the Mainwindow
 
     InitWindow(windowWidht, windowHeight, "Catch_Game");        // Initialaising the Game Window
@@ -19,21 +19,18 @@ int main()
     float jumpForce = -700;     // Jump force: is applied at the beginning of the jump to VerticalY and slowly 
     bool onGround = false;      // Checks if the player is on Ground
 
-    /*Image playerimage = 
-    LoadImage("C:\Users\helene\Documents\checkouts\Catch-game\\textures\\player_test.png"); // Loading the player image
-    
-    // !!!Speicherort muss aktuell noch bei jedem gerät veröndert werden!!!
+    Image playerimage = LoadImage("textures\\player_test.png"); // Loading the player image
 
     ImageColorReplace(&playerimage, WHITE, (Color){ 0, 0, 0, 0 }); // Weiß wird transparent
    
     // In eine Textur umwandeln
     Texture2D playertexture = LoadTextureFromImage(playerimage);
     UnloadImage(playerimage); // Originalbild freigeben
-*/
+
     // Initialising the Obstacles    
 
     Rectangle obstacles[NUM_OBSTACLES] = {
-        { 0, windowHeight - 20, windowWidht, 20 },  // GROUND
+        { 0, windowHeight - 95, windowWidht, 95 },  // GROUND
         { 150, 300, 150, 20 },   // Platform 1
         { 500, 300, 150, 20 }    // Platform 2
     };
@@ -120,25 +117,26 @@ int main()
         ClearBackground(BLACK);
         DrawTexture(background, 0, 0, WHITE);
 
-        /*// 5. Textur mit transparenter Darstellung anstatt des Rechtecks zeichnen
+        // 5. Player texture
         DrawTexturePro(playertexture, 
-            (Rectangle){ 0, 0, playertexture.width, playertexture.height }, // Quellbereich
+            (Rectangle){ 0, 0, playertexture.width, playertexture.height }, 
             playerRec, // Zielbereich mit Position und Größe wie Rechteck
             (Vector2){ 0, 0 }, // Kein Offset
             0.0f, // Keine Rotation
             WHITE); // Standardfarbe
-        */
-        DrawRectangleRec(playerRec, PURPLE);        // Player
+        
+        //DrawRectangleRec(playerRec, PURPLE);        // Player Rectangle
 
         // Obstacles
-        for (int i = 0; i < NUM_OBSTACLES; i++) {
+        for (int i = 1; i < NUM_OBSTACLES; i++) {
             DrawRectangleRec(obstacles[i], PINK);
         }
 
         EndDrawing();
     }
 
-    //UnloadTexture(playertexture);
+    UnloadTexture(playertexture);
+    UnloadTexture(background);
     CloseWindow();
     return 0;
 }
