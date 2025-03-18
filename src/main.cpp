@@ -1,38 +1,36 @@
 #include <raylib.h>
-#define GRAVITY 400
 #define NUM_OBSTACLES 3
 
-void Kollisionscheck(Rectangle Player,float velocityY,float gravity,
-                    float playerspeed,float jumpForce, bool ,Rectangle oldPlayer, Rectangle obstacles[]){
-    // Kollisionscheck
+void Kollisionscheck(Rectangle *Player,float* velocityY,float* gravity,
+                    float* playerspeed,float* jumpForce,Rectangle *oldPlayer, Rectangle obstacles[],bool* onGround){
 
     for (int i = 0; i < NUM_OBSTACLES; i++) {
-        if (CheckCollisionRecs(Player, obstacles[i])) {
-            if(oldPlayer + oldPlayer.height <= obstacles[i].y) // Upside: checks if the player is falling 
+        if (CheckCollisionRecs(*Player, obstacles[i])) {
+            if(oldPlayer->y + oldPlayer->height <= obstacles[i].y) // Upside: checks if the player is falling 
             {
-                Player.y = obstacles[i].y - oldPlayer1.height;     // sets the player on the obstacle
-                onGround = true;        // Now the player can jump again
-                velocityY = 0;          // That the player stops building vertical speed
+                Player->y = obstacles[i].y - oldPlayer->height;     // sets the player on the obstacle
+                *onGround = true;        // Now the player can jump again
+                *velocityY = 0;          // That the player stops building vertical speed
             }
-            else if (oldPlayer >= obstacles[i].y + obstacles[i].height) // Downside
+            else if (oldPlayer->y >= obstacles[i].y + obstacles[i].height) // Downside
             {
-                Player1.y = obstacles[i].y + obstacles[i].height;     // sets the player on the downside of the obstacle
-                onGround1 = false;       // The player shouldnt be able to jump if hes on the downside
-                velocityY1 = 0;          // Reset vertical speed, so the player falls
+                Player->y = obstacles[i].y + obstacles[i].height;     // sets the player on the downside of the obstacle
+                *onGround = false;       // The player shouldnt be able to jump if hes on the downside
+                *velocityY = 0;          // Reset vertical speed, so the player falls
             }
-            else if (oldPlayerRec.x < Player1.x)  // Left side: checks if the player moved right
+            else if (oldPlayer->x < Player->x)  // Left side: checks if the player moved right
             {
-                Player1.x = obstacles[i].x - Player1.width;     // sets the player on the Left side of the obstacle
+                Player->x = obstacles[i].x - Player->width;     // sets the player on the Left side of the obstacle
             }
-            else if (oldPlayer1.x > Player1.x)  // Right side: checks if the player moved left
+            else if (oldPlayer->x > Player->x)  // Right side: checks if the player moved left
             {
-                Player1.x = obstacles[i].x + obstacles[i].width;   // sets the player on the Right side of the obstacle
+                Player->x = obstacles[i].x + obstacles[i].width;   // sets the player on the Right side of the obstacle
             }
             break;      // Only one collision at a frame
         }
         else
         {
-            onGround = false;   // if the player doesnt collide with or stand on an obstacle hes falling
+            *onGround = false;   // if the player doesnt collide with or stand on an obstacle hes falling
         }
     }
 }
@@ -50,25 +48,24 @@ int main()
     Rectangle Player1 = { 150, 100, 50, 50 };        // Initialising the Player Rectangle   
 
     float velocityY1 = 0;            // Vertical velocity (+ ... the player falls, - ... flies up )
-    float gravity = 800;           // Gravitation (Pixel per s^2)
+    float gravity = 1200;           // Gravitation (Pixel per s^2)
     float playerspeed = 400;       // Movementspeed (Pixel per s)
-    float jumpForce1 = -700;      // Jump force: is applied at the beginning of the jump to VerticalY and slowly 
+    float jumpForce1 = -600;      // Jump force: is applied at the beginning of the jump to VerticalY and slowly 
     bool onGround1 = false;      // Checks if the player is on Ground
                                 //player speed und gravity sind konstant bei beide spieler
-    Rectangle Player2 = { 150, 100, 50, 50 };        // Initialising the Player Rectangle   
+    Rectangle Player2 = { 550, 100, 50, 50 };        // Initialising the Player Rectangle   
 
     float velocityY2 = 0;        // Vertical velocity (+ ... the player falls, - ... flies up )
-           // Gravitation (Pixel per s^2)
     float jumpForce2 = -700;     // Jump force: is applied at the beginning of the jump to VerticalY and slowly 
     bool onGround2 = false;      // Checks if the player is on Ground
-    Image playerimage1 = LoadImage("textures\\player_test.png"); // Loading the player image
-    Image playerimage2 = LoadImage("textures\\player_test.png");    ImageColorReplace(&playerimage2, WHITE, (Color){ 0, 0, 0, 0 }); // Weiß wird transparent
+    //Image playerimage1 = LoadImage("textures\\player_test.png"); // Loading the player image
+    //Image playerimage2 = LoadImage("textures\\player_test.png");    ImageColorReplace(&playerimage2, WHITE, (Color){ 0, 0, 0, 0 }); // Weiß wird transparent
    
     // In eine Textur umwandeln
-    Texture2D playertexture = LoadTextureFromImage(playerimage1);
+    /*Texture2D playertexture = LoadTextureFromImage(playerimage1);
     UnloadImage(playerimage1); // Originalbild freigeben
     Texture2D playertexture = LoadTextureFromImage(playerimage2);
-    UnloadImage(playerimage2); // Originalbild freigeben
+    UnloadImage(playerimage2); // Originalbild freigeben*/
     // Initialising the Obstacles    
 
     Rectangle obstacles[NUM_OBSTACLES] = {
@@ -115,8 +112,8 @@ int main()
 
             // Kollisionscheck
 
-        Kollisionscheck(Player1,velocityY1, gravity, playerspeed,jumpForce1,onGround1,obstacles);
-        Kollisionscheck(Player2,velocityY2, gravity, playerspeed,jumpForce2,onGround2,obstacles )
+        Kollisionscheck(&Player1,&velocityY1, &gravity, &playerspeed,&jumpForce1,&oldPlayer1,obstacles,&onGround1);
+        Kollisionscheck(&Player2,&velocityY2, &gravity, &playerspeed,&jumpForce2,&oldPlayer2,obstacles,&onGround2);
 
         // Jumping
 
@@ -124,9 +121,12 @@ int main()
             velocityY1 = jumpForce1;
             onGround1 = false;
         }
-       
+        if (IsKeyPressed(KEY_W) && onGround2) {
+            velocityY2 = jumpForce2;
+            onGround2 = false;
+        }
         // Side barriers
-
+        //Player1
         if(Player1.x<0)       // Left side
             Player1.x = 0;
 
@@ -136,7 +136,20 @@ int main()
         if(Player1.y < 0)       // Upside
         {
             Player1.y = 0;
-            velocityY = 0;
+            velocityY1 = 0;
+        }
+
+        //Player2
+        if(Player2.x<0)       // Left side
+            Player2.x = 0;
+
+        if(Player2.x + Player2.width > windowWidht)     // Right side
+            Player2.x = windowWidht - Player2.width;
+
+        if(Player2.y < 0)       // Upside
+        {
+            Player2.y = 0;
+            velocityY2 = 0;
         }
         // Drawing the Frame
 
@@ -146,24 +159,24 @@ int main()
         DrawTexture(background, 0, 0, WHITE);
 
         // 5. Player texture
-        DrawTexturePro(playertexture, 
+        /*DrawTexturePro(playertexture, 
             (Rectangle){ 0, 0, playertexture.width, playertexture.height }, 
             Player1, // Zielbereich mit Position und Größe wie Rechteck
             (Vector2){ 0, 0 }, // Kein Offset
             0.0f, // Keine Rotation
             WHITE); // Standardfarbe
-        
-        //DrawRectangleRec(playerRec, PURPLE);        // Player Rectangle
-
+        */
+        DrawRectangleRec(Player1, DARKGREEN);        // Player Rectangle
+        DrawRectangleRec(Player2, DARKPURPLE);
         // Obstacles
         for (int i = 1; i < NUM_OBSTACLES; i++) {
-            DrawRectangleRec(obstacles[i], PINK);
+            DrawRectangleRec(obstacles[i], DARKBLUE);
         }
 
         EndDrawing();
     }
 
-    UnloadTexture(playertexture);
+    //UnloadTexture(playertexture);
     UnloadTexture(background);
     CloseWindow();
     return 0;
