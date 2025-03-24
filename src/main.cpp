@@ -45,18 +45,21 @@ int main()
 
     Texture2D background = LoadTexture("textures\\Background1.png");  // Loading Background Image
 
-    Rectangle Player1 = { 150, 100, 50, 50 };        // Initialising the Player Rectangle   
+    int catcher=0;        // determins who is the catcher( 0=Player1 , 1=Player2)
+    int catchStreak = 0;  // number of Colliding player frames
 
-    float velocityY1 = 0;            // Vertical velocity (+ ... the player falls, - ... flies up )
     float gravity = 1200;           // Gravitation (Pixel per s^2)
     float playerspeed = 400;       // Movementspeed (Pixel per s)
-    float jumpForce1 = -600;      // Jump force: is applied at the beginning of the jump to VerticalY and slowly 
+    float jumpForce = -700;      // Jump force: is applied at the beginning of the jump to VerticalY and slowly 
+
+    Rectangle Player1 = { 550, 100, 50, 50 };        // Initialising the Player Rectangle   
+
+    float velocityY1 = 0;            // Vertical velocity (+ ... the player falls, - ... flies up )
     bool onGround1 = false;      // Checks if the player is on Ground
-                                //player speed und gravity sind konstant bei beide spieler
-    Rectangle Player2 = { 550, 100, 50, 50 };        // Initialising the Player Rectangle   
+    
+    Rectangle Player2 = { 150, 100, 50, 50 };        // Initialising the Player Rectangle   
 
     float velocityY2 = 0;        // Vertical velocity (+ ... the player falls, - ... flies up )
-    float jumpForce2 = -700;     // Jump force: is applied at the beginning of the jump to VerticalY and slowly 
     bool onGround2 = false;      // Checks if the player is on Ground
     //Image playerimage1 = LoadImage("textures\\player_test.png"); // Loading the player image
     //Image playerimage2 = LoadImage("textures\\player_test.png");    ImageColorReplace(&playerimage2, WHITE, (Color){ 0, 0, 0, 0 }); // Weiß wird transparent
@@ -112,17 +115,17 @@ int main()
 
             // Kollisionscheck
 
-        Kollisionscheck(&Player1,&velocityY1, &gravity, &playerspeed,&jumpForce1,&oldPlayer1,obstacles,&onGround1);
-        Kollisionscheck(&Player2,&velocityY2, &gravity, &playerspeed,&jumpForce2,&oldPlayer2,obstacles,&onGround2);
+        Kollisionscheck(&Player1,&velocityY1, &gravity, &playerspeed,&jumpForce,&oldPlayer1,obstacles,&onGround1);
+        Kollisionscheck(&Player2,&velocityY2, &gravity, &playerspeed,&jumpForce,&oldPlayer2,obstacles,&onGround2);
 
         // Jumping
 
         if (IsKeyPressed(KEY_UP) && onGround1) {
-            velocityY1 = jumpForce1;
+            velocityY1 = jumpForce;
             onGround1 = false;
         }
         if (IsKeyPressed(KEY_W) && onGround2) {
-            velocityY2 = jumpForce2;
+            velocityY2 = jumpForce;
             onGround2 = false;
         }
         // Side barriers
@@ -151,10 +154,24 @@ int main()
             Player2.y = 0;
             velocityY2 = 0;
         }
-        // Drawing the Frame
-
-        BeginDrawing();
+        // Checking the catchers
         
+        if (CheckCollisionRecs(Player1, Player2))
+        {
+            if(catchStreak == 0)
+            {
+                if(catcher == 0)
+                catcher = 1;
+                else
+                catcher = 0;
+
+                catchStreak++;
+            }
+        }
+        else 
+            catchStreak = 0;
+       // Drawing the Frame
+        BeginDrawing();
         ClearBackground(BLACK);
         DrawTexture(background, 0, 0, WHITE);
 
@@ -166,8 +183,16 @@ int main()
             0.0f, // Keine Rotation
             WHITE); // Standardfarbe
         */
-        DrawRectangleRec(Player1, DARKGREEN);        // Player Rectangle
-        DrawRectangleRec(Player2, DARKPURPLE);
+        if(catcher == 0)
+        {
+            DrawRectangleRec(Player1, YELLOW);        // Player Rectangle
+            DrawRectangleRec(Player2, BLUE);
+        }
+        else
+        {
+            DrawRectangleRec(Player1, BLUE);        // Player Rectangle
+            DrawRectangleRec(Player2, YELLOW);
+        }
         // Obstacles
         for (int i = 1; i < NUM_OBSTACLES; i++) {
             DrawRectangleRec(obstacles[i], DARKBLUE);
