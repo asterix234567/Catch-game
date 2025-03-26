@@ -1,4 +1,5 @@
 #include <raylib.h>
+#include <stdio.h>
 #define NUM_OBSTACLES 3
 
 void Kollisionscheck(Rectangle *Player,float* velocityY,float* gravity,
@@ -66,11 +67,14 @@ int main()
 
     InitWindow(windowWidht, windowHeight, "Catch_Game");        // Initialaising the Game Window
 
-    int catcher=0;        // determins who is the catcher( 0=Player1 , 1=Player2)
+    int catcher = 0;        // determins who is the catcher( 0=Player1 , 1=Player2)
     int catchStreak = 0;  // number of Colliding player frames
 
-    float timePassed = 0;       // Sum of the passed time since the round start
-    float timeLimit = 30;       // Roundtime in
+    float timeLimit = 30;       // Maximal time
+    float timePassed = timeLimit;       // Sum of the passed time since the round start 
+    char timePrint[10];         // string for Printing the timer
+    int timerSize = 40;         // Size for the printed timer
+
 
     float gravity = 1600;           // Gravitation (Pixel per s^2)
     float playerspeed = 550;       // Movementspeed (Pixel per s)
@@ -109,7 +113,9 @@ int main()
 
     while(!WindowShouldClose())
     {
-        float dt = GetFrameTime(); // Time since the last frame (Multiply with every speed)
+        float dt = GetFrameTime(); // Time in s since the last frame (Multiply with every speed)
+
+        timePassed -= dt;       // Reducing the passed time from the sumTime
 
         Rectangle oldPlayer1 = Player1;
         Rectangle oldPlayer2 = Player2;     // saves the last postion of the player
@@ -209,7 +215,12 @@ int main()
             DrawRectangleRec(obstacles[i], DARKBLUE);
         }
         
-        DrawRectangleRec(CatcherMarker, RED);     
+        DrawRectangleRec(CatcherMarker, RED);
+
+        sprintf(timePrint, "%0.0f", timePassed);        // Converting the time into a string
+        int textWidth = MeasureText(timePrint, timerSize);         // saving the text widht into a variable
+        DrawText(timePrint, (windowWidht - textWidth) / 2, 0, timerSize, BLACK);    
+
         EndDrawing();
     }
 
