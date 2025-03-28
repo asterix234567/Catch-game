@@ -2,8 +2,17 @@
 #include <stdio.h>
 #define NUM_OBSTACLES 3
 
-void Kollisionscheck(Rectangle *Player,float* velocityY,float* gravity,
-                    float* playerspeed,float* jumpForce,Rectangle *oldPlayer, Rectangle obstacles[],bool* onGround){
+Rectangle OrigPlayerVar(Rectangle Player, float *velocityY, bool *onGround, float Playerx)      // Setting the player Coordinates and stats for the Round
+{
+    Player = { Playerx, 100, 50, 50 };// Initialising the Player Rectangle   
+    *velocityY = 0;                  // Vertical velocity (+ ... the player falls, - ... flies up )
+    *onGround = false;              // Checks if the player is on Ground
+
+    return Player;
+}
+
+void Kollisionscheck(Rectangle *Player,float* velocityY,float* gravity,float* playerspeed,
+                    float* jumpForce,Rectangle *oldPlayer, Rectangle obstacles[],bool* onGround){
 
     for (int i = 0; i < NUM_OBSTACLES; i++) {
         if (CheckCollisionRecs(*Player, obstacles[i])) {
@@ -11,7 +20,7 @@ void Kollisionscheck(Rectangle *Player,float* velocityY,float* gravity,
             {
                 Player->y = obstacles[i].y - oldPlayer->height;     // sets the player on the obstacle
                 *onGround = true;        // Now the player can jump again
-                *velocityY = 0;          // That the player stops building vertical speed
+                *velocityY = 0;         // That the player stops building vertical speed
             }
             else if (oldPlayer->y >= obstacles[i].y + obstacles[i].height) // Downside
             {
@@ -52,7 +61,7 @@ if(Player.y < 0)       // Upside
 return Player;
 }
 
-Rectangle CatcherMarker_xy(Rectangle CatcherMarker, Rectangle Player)
+Rectangle CatcherMarker_xy(Rectangle CatcherMarker, Rectangle Player)   // Setting the Coordinates for the Player Marker
 {
     CatcherMarker.x = Player.x + Player.width / 2 - CatcherMarker.width / 2;
     CatcherMarker.y = Player.y - CatcherMarker.height;
@@ -73,23 +82,32 @@ int main()
     float timeLimit = 30;       // Maximal time
     float timePassed = timeLimit;       // Sum of the passed time since the round start 
     char timePrint[10];         // string for Printing the timer
-    int timerSize = 40;         // Size for the printed timer
+    int timerSize = 40;         // Size for the printed timer 
 
+    int roundCount = 0;         
+    char roundPrint[7] = "ROUND "; 
+    int roundPrintSize = 60;     
 
     float gravity = 1600;           // Gravitation (Pixel per s^2)
     float playerspeed = 550;       // Movementspeed (Pixel per s)
     float jumpForce = -850;      // Jump force: is applied at the beginning of the jump to VerticalY and slowly 
 
-    Rectangle Player1 = { 550, 100, 50, 50 };        // Initialising the Player Rectangle   
+    Rectangle Player1;   
+    float velocityY1;           
+    bool onGround1;
+    float origPlayer1x = 550;
+    Player1 = OrigPlayerVar(Player1, &velocityY1, &onGround1, origPlayer1x);     
+    int Player1points=0;
 
-    float velocityY1 = 0;            // Vertical velocity (+ ... the player falls, - ... flies up )
-    bool onGround1 = false;      // Checks if the player is on Ground
-    
-    Rectangle Player2 = { 150, 100, 50, 50 };        // Initialising the Player Rectangle   
 
-    float velocityY2 = 0;        // Vertical velocity (+ ... the player falls, - ... flies up )
-    bool onGround2 = false;      // Checks if the player is on Ground
-    
+
+    Rectangle Player2;
+    float velocityY2; 
+    bool onGround2;
+    float origPlayer2x = 150;
+    Player2 = OrigPlayerVar(Player1, &velocityY2, &onGround2, origPlayer2x);
+    int Player2points=0;
+
     Rectangle CatcherMarker = { 0, 0, Player1.width / 2, (Player1.height * 2) / 3};    // Stays above the Catchers head
 
     Texture2D background = LoadTexture("textures\\Background1.png");  // Loading Background Image
@@ -116,6 +134,21 @@ int main()
         float dt = GetFrameTime(); // Time in s since the last frame (Multiply with every speed)
 
         timePassed -= dt;       // Reducing the passed time from the sumTime
+
+        if(timePassed <= 0.00)
+        {
+            Player1 = OrigPlayerVar(Player1, &velocityY1, &onGround1, origPlayer1x);
+            Player2 = OrigPlayerVar(Player2, &velocityY2, &onGround2, origPlayer2x);
+            timePassed = timeLimit;
+            
+            roundCount++;
+            roundPrint[6] = roundCount;
+
+            if(catcher==0)
+                Player2points++;
+            else
+                Player1points++;
+        }
 
         Rectangle oldPlayer1 = Player1;
         Rectangle oldPlayer2 = Player2;     // saves the last postion of the player
@@ -194,6 +227,23 @@ int main()
 
        // Drawing the Frame
         BeginDrawing();
+
+        if(Player1points==3)
+        {
+            ClearBackground(BLUE);
+        }
+        else if(Player2points == 3) 
+        {
+            ClearBackground(RED);
+        }
+        
+        if(timePassed == 30)
+        {
+            ClearBackground(RED);
+            int roundPrintWidth = MeasureText(roundPrint, roundPrintSize);         // saving the text widht into a variable
+            DrawText(roundPrint, (windowWidht - roundPrintWidth) / 2, windowHeight / 2, roundPrintSize, BLACK);  
+            WaitTime(2);
+        }
         ClearBackground(BLACK);
         DrawTexture(background, 0, 0, WHITE);
 
