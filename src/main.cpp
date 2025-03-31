@@ -1,5 +1,6 @@
-#include <raylib.h>
+#include "raylib.h"
 #include <stdio.h>
+
 #define NUM_OBSTACLES 3
 
 Rectangle OrigPlayerVar(Rectangle Player, float *velocityY, bool *onGround, float Playerx)      // Setting the player Coordinates and stats for the Round
@@ -79,13 +80,13 @@ int main()
     int catcher = 0;        // determins who is the catcher( 0=Player1 , 1=Player2)
     int catchStreak = 0;  // number of Colliding player frames
 
-    float timeLimit = 30;       // Maximal time
-    float timePassed = timeLimit;       // Sum of the passed time since the round start 
+    double timeLimit = 32;       // Maximal time (+1 for the start screen, +1 that it prints 30 )
+    double timePassed = timeLimit;       // Sum of the passed time since the round start 
     char timePrint[10];         // string for Printing the timer
     int timerSize = 40;         // Size for the printed timer 
 
-    int roundCount = 0;         
-    char roundPrint[7] = "ROUND "; 
+    char roundCount = '1';         
+    char roundPrint[16] = "0 - ROUND 1 - 0"; 
     int roundPrintSize = 60;     
 
     float gravity = 1600;           // Gravitation (Pixel per s^2)
@@ -95,18 +96,16 @@ int main()
     Rectangle Player1;   
     float velocityY1;           
     bool onGround1;
-    float origPlayer1x = 550;
+    float origPlayer1x = 150;
     Player1 = OrigPlayerVar(Player1, &velocityY1, &onGround1, origPlayer1x);     
-    int Player1points=0;
-
-
+    char Player1points = '0';
 
     Rectangle Player2;
     float velocityY2; 
     bool onGround2;
-    float origPlayer2x = 150;
+    float origPlayer2x = 550;
     Player2 = OrigPlayerVar(Player1, &velocityY2, &onGround2, origPlayer2x);
-    int Player2points=0;
+    int Player2points = '0';
 
     Rectangle CatcherMarker = { 0, 0, Player1.width / 2, (Player1.height * 2) / 3};    // Stays above the Catchers head
 
@@ -132,34 +131,51 @@ int main()
     while(!WindowShouldClose())
     {
         float dt = GetFrameTime(); // Time in s since the last frame (Multiply with every speed)
-
-        timePassed -= dt;       // Reducing the passed time from the sumTime
-
-        if(timePassed <= 0.00)
+        
+        if(timePassed == 32)        // Printing Start screen
+        {
+            int roundPrintWidth = MeasureText(roundPrint, roundPrintSize);         // saving the text widht into a variable
+            
+            while(!IsKeyPressed(KEY_SPACE))
+            {
+                BeginDrawing();
+                
+                ClearBackground(RED);
+                DrawText(roundPrint, (windowWidht - roundPrintWidth) / 2, (windowHeight - roundPrintSize) / 2, roundPrintSize, BLACK);  
+                EndDrawing();
+            }
+            timePassed -= 1;
+        }
+        else if(timePassed <= 0.00)     // Resets the timer and Player variables if the round is over
         {
             Player1 = OrigPlayerVar(Player1, &velocityY1, &onGround1, origPlayer1x);
             Player2 = OrigPlayerVar(Player2, &velocityY2, &onGround2, origPlayer2x);
             timePassed = timeLimit;
-            
-            roundCount++;
-            roundPrint[6] = roundCount;
+
+            roundCount++;       // Next Round + 1
+            roundPrint[10] = roundCount;    // Transform into ASCII (2 = 50)
 
             if(catcher==0)
                 Player2points++;
             else
                 Player1points++;
+
+            roundPrint[0] = Player1points;
+            roundPrint[14] = Player2points;
         }
+        else
+            timePassed -= dt;       // Reducing the passed time from the sumTime
 
         Rectangle oldPlayer1 = Player1;
         Rectangle oldPlayer2 = Player2;     // saves the last postion of the player
 
         // Horizontal Movement with Arrow-Keys
 
-        if(IsKeyDown(KEY_RIGHT))
+        if(IsKeyDown(KEY_D))
         {
             Player1.x += playerspeed * dt;
         }
-        else if(IsKeyDown(KEY_LEFT))
+        else if(IsKeyDown(KEY_A))
         {
             Player1.x -= playerspeed * dt;
         }
@@ -168,11 +184,11 @@ int main()
         velocityY1 += gravity * dt;
         Player1.y += velocityY1 * dt;
         
-        if(IsKeyDown(KEY_D))
+        if(IsKeyDown(KEY_RIGHT))
         {
             Player2.x += playerspeed * dt;
         }
-        else if(IsKeyDown(KEY_A))
+        else if(IsKeyDown(KEY_LEFT))
         {
             Player2.x -= playerspeed * dt;
         }
@@ -188,11 +204,11 @@ int main()
  
         // Jumping
 
-        if (IsKeyPressed(KEY_UP) && onGround1) {
+        if (IsKeyPressed(KEY_W) && onGround1) {
             velocityY1 = jumpForce;
             onGround1 = false;
         }
-        if (IsKeyPressed(KEY_W) && onGround2) {
+        if (IsKeyPressed(KEY_UP) && onGround2) {
             velocityY2 = jumpForce;
             onGround2 = false;
         }
@@ -227,23 +243,7 @@ int main()
 
        // Drawing the Frame
         BeginDrawing();
-
-        if(Player1points==3)
-        {
-            ClearBackground(BLUE);
-        }
-        else if(Player2points == 3) 
-        {
-            ClearBackground(RED);
-        }
         
-        if(timePassed == 30)
-        {
-            ClearBackground(RED);
-            int roundPrintWidth = MeasureText(roundPrint, roundPrintSize);         // saving the text widht into a variable
-            DrawText(roundPrint, (windowWidht - roundPrintWidth) / 2, windowHeight / 2, roundPrintSize, BLACK);  
-            WaitTime(2);
-        }
         ClearBackground(BLACK);
         DrawTexture(background, 0, 0, WHITE);
 
@@ -260,6 +260,14 @@ int main()
         DrawRectangleRec(Player1, BLUE);        
         DrawRectangleRec(Player2, YELLOW);
         
+        if(Player1points=='3')
+        {
+            ClearBackground(BLUE);
+        }
+        else if(Player2points == '3') 
+        {
+            ClearBackground(RED);
+        }
         // Obstacles
         for (int i = 1; i < NUM_OBSTACLES; i++) {
             DrawRectangleRec(obstacles[i], DARKBLUE);
