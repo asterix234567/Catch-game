@@ -77,10 +77,10 @@ int main()
 
     InitWindow(windowWidht, windowHeight, "Catch_Game");        // Initialaising the Game Window
 
-    int catcher = 0;        // determins who is the catcher( 0=Player1 , 1=Player2)
+    int catcher = 1;        // determins who is the catcher( 0=Player1 , 1=Player2)
     int catchStreak = 0;  // number of Colliding player frames
 
-    double timeLimit = 32;       // Maximal time (+1 for the start screen, +1 that it prints 30 )
+    double timeLimit = 31;       // Maximal time (+1 for the start screen)
     double timePassed = timeLimit;       // Sum of the passed time since the round start 
     char timePrint[10];         // string for Printing the timer
     int timerSize = 40;         // Size for the printed timer 
@@ -98,7 +98,7 @@ int main()
     bool onGround1;
     float origPlayer1x = 150;
     Player1 = OrigPlayerVar(Player1, &velocityY1, &onGround1, origPlayer1x);     
-    char Player1points = '0';
+    int Player1points = '0';
 
     Rectangle Player2;
     float velocityY2; 
@@ -132,7 +132,7 @@ int main()
     {
         float dt = GetFrameTime(); // Time in s since the last frame (Multiply with every speed)
         
-        if(timePassed == 32)        // Printing Start screen
+        if(timePassed == 31)        // Printing Start screen
         {
             int roundPrintWidth = MeasureText(roundPrint, roundPrintSize);         // saving the text widht into a variable
             
@@ -150,6 +150,7 @@ int main()
         {
             Player1 = OrigPlayerVar(Player1, &velocityY1, &onGround1, origPlayer1x);
             Player2 = OrigPlayerVar(Player2, &velocityY2, &onGround2, origPlayer2x);
+            
             timePassed = timeLimit;
 
             roundCount++;       // Next Round + 1
@@ -162,10 +163,29 @@ int main()
 
             roundPrint[0] = Player1points;
             roundPrint[14] = Player2points;
+            
         }
         else
             timePassed -= dt;       // Reducing the passed time from the sumTime
 
+        if(Player1points == '3')
+        {
+            while (1)
+            { 
+                BeginDrawing();
+                ClearBackground(BLUE);
+                EndDrawing();
+            }
+        }
+        else if(Player2points == '3') 
+        {
+            while (1)
+            { 
+                BeginDrawing();
+                ClearBackground(RED);
+                EndDrawing();
+            }
+        }
         Rectangle oldPlayer1 = Player1;
         Rectangle oldPlayer2 = Player2;     // saves the last postion of the player
 
@@ -259,15 +279,7 @@ int main()
         // Player Rectangles
         DrawRectangleRec(Player1, BLUE);        
         DrawRectangleRec(Player2, YELLOW);
-        
-        if(Player1points=='3')
-        {
-            ClearBackground(BLUE);
-        }
-        else if(Player2points == '3') 
-        {
-            ClearBackground(RED);
-        }
+
         // Obstacles
         for (int i = 1; i < NUM_OBSTACLES; i++) {
             DrawRectangleRec(obstacles[i], DARKBLUE);
