@@ -1,6 +1,6 @@
 #include "raylib.h"
 #include <stdio.h>
-
+// ALta
 #define NUM_OBSTACLES 3
 
 Rectangle OrigPlayerVar(Rectangle Player, float *velocityY, bool *onGround, float Playerx)      // Setting the player Coordinates and stats for the Round
