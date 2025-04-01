@@ -5,7 +5,7 @@
 
 Rectangle OrigPlayerVar(Rectangle Player, float *velocityY, bool *onGround, float Playerx)      // Setting the player Coordinates and stats for the Round
 {
-    Player = { Playerx, 100, 50, 50 };// Initialising the Player Rectangle   
+    Player = { Playerx, 100, 40, 50 };// Initialising the Player Rectangle   
     *velocityY = 0;                  // Vertical velocity (+ ... the player falls, - ... flies up )
     *onGround = false;              // Checks if the player is on Ground
 
@@ -109,15 +109,9 @@ int main()
 
     Rectangle CatcherMarker = { 0, 0, Player1.width / 2, (Player1.height * 2) / 3};    // Stays above the Catchers head
 
-    Texture2D background = LoadTexture("textures\\Background1.png");  // Loading Background Image
-    //Image playerimage1 = LoadImage("textures\\player_test.png"); // Loading the player image
-    //Image playerimage2 = LoadImage("textures\\player_test.png");    ImageColorReplace(&playerimage2, WHITE, (Color){ 0, 0, 0, 0 }); // Weiß wird transparent
-   
-    // In eine Textur umwandeln
-    /*Texture2D playertexture = LoadTextureFromImage(playerimage1);
-    UnloadImage(playerimage1); // Originalbild freigeben
-    Texture2D playertexture = LoadTextureFromImage(playerimage2);
-    UnloadImage(playerimage2); // Originalbild freigeben*/
+    Texture2D background = LoadTexture("textures\\Background.png");  // Loading Background Image
+    Texture2D playertexture1 = LoadTexture("textures\\player1.png");
+    //Texture2D playertexture2 = LoadTextureFromImage(playerimage2);
 
     // Initialising the Obstacles   
     Rectangle obstacles[NUM_OBSTACLES] = {
@@ -182,7 +176,7 @@ int main()
             while (1)
             { 
                 BeginDrawing();
-                ClearBackground(RED);
+                ClearBackground(YELLOW);
                 EndDrawing();
             }
         }
@@ -268,16 +262,22 @@ int main()
         DrawTexture(background, 0, 0, WHITE);
 
         // 5. Player texture
-        /*DrawTexturePro(playertexture, 
-            (Rectangle){ 0, 0, playertexture.width, playertexture.height }, 
+        DrawTexturePro(playertexture1, (Rectangle){ 0, 0, playertexture1.width, playertexture1.height }, 
             Player1, // Zielbereich mit Position und Größe wie Rechteck
             (Vector2){ 0, 0 }, // Kein Offset
             0.0f, // Keine Rotation
             WHITE); // Standardfarbe
+        
+            /*// 5. Player texture
+        DrawTexturePro(playertexture2, (Rectangle){ 0, 0, playertexture2.width, playertexture2.height }, 
+        Player2, // Zielbereich mit Position und Größe wie Rechteck
+        (Vector2){ 0, 0 }, // Kein Offset
+        0.0f, // Keine Rotation
+        WHITE); // Standardfarbe
         */
-
+       
         // Player Rectangles
-        DrawRectangleRec(Player1, BLUE);        
+        //DrawRectangleRec(Player1, BLUE);        
         DrawRectangleRec(Player2, YELLOW);
 
         // Obstacles
@@ -294,7 +294,8 @@ int main()
         EndDrawing();
     }
 
-    //UnloadTexture(playertexture);
+    UnloadTexture(playertexture1);
+    //UnloadTexture(playertexture2):
     UnloadTexture(background);
     CloseWindow();
     return 0;
