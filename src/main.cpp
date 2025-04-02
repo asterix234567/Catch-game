@@ -84,7 +84,7 @@ void TexturePrint(Rectangle Area, Texture2D texture)
 int main() 
 { 
     const int windowWidht = 878;                                        // Lenght of the Mainwindow
-    const int windowHeight = 500;                                       // Widht of the Mainwindow
+    const int windowHeight = 600;                                       // Widht of the Mainwindow
 
     InitWindow(windowWidht, windowHeight, "Catch_Game");                // Initialaising the Game Window
 
@@ -104,7 +104,6 @@ int main()
     float playerspeed = 550;                                            // Movementspeed (Pixel per s)
     float jumpForce = -850;                                             // Jump force: is applied at the beginning of the jump to VerticalY and slowly 
 
-
     Rectangle Player1;   
     float velocityY1;           
     bool onGround1;
@@ -117,21 +116,21 @@ int main()
     float velocityY2; 
     bool onGround2;
     float origPlayer2x = 650;
-    Player2 = OrigPlayerVar(Player1, &velocityY2, &onGround2, origPlayer2x);
+    Player2 = OrigPlayerVar(Player2, &velocityY2, &onGround2, origPlayer2x);
     int Player2points = '0';
 
 
     Rectangle CatcherMarker = { 0, 0, Player1.width / 2, (Player1.height * 2) / 3};  // Stays above the Catchers head
 
-    Texture2D background = LoadTexture("textures\\Background.png");                  // Loading Background Image
-    Texture2D playertexture1 = LoadTexture("textures\\player1.png");
-    Texture2D playertexture2 = LoadTexture("textures\\player2.png");
+    Texture2D background = LoadTexture("textures\\CobraKaiBackground.png");                  // Loading Background Image
+    Texture2D playertexture1 = LoadTexture("textures\\John_Kreese.png");
+    Texture2D playertexture2 = LoadTexture("textures\\Terry_Silver.png");
     Texture2D grassIsland = LoadTexture("textures\\grass_island.png");
     Texture2D catcherMarkerTexture = LoadTexture("textures\\playerMarker.png");
 
     // Initialising the Obstacles   
     Rectangle obstacles[NUM_OBSTACLES] = {
-        { 0, windowHeight - 95, windowWidht, 95 },  // GROUND
+        { 0, windowHeight - 96, windowWidht, 96 },  // GROUND
         { (windowWidht - 150) / 6, 280, 150, 20 },  // Platform 1
         { (windowWidht - 150) / 6 * 5, 280, 150, 20 },  // Platform 2
         { (windowWidht - 200) / 2, 155, 200, 17 },  // Platform 3
